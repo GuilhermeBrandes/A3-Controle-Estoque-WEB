@@ -1,5 +1,12 @@
 {
-    "java.project.referencedLibraries": [
-        "lib/**/*.jar"
-    ]
+    "java.project.referencedLibraries": {
+        "include": [
+            "lib/**/*.jar",
+            "webapp/WEB-INF/lib/mysql-connector-j-9.5.0.jar",
+            "webapp/WEB-INF/lib/javax.servlet-api-4.0.1.jar"
+        ],
+        "exclude": [
+            "lib/mysql-connector-j-9.5.0.jar"
+        ]
+    }
 }
