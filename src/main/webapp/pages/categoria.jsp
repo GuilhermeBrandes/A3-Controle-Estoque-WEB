@@ -3,7 +3,9 @@
 <%@ page import="br.unisul.controleestoque.model.Categoria" %>
 
 <%
+    // Captura os dados se estivermos em modo de edição
     Categoria catEdicao = (Categoria) request.getAttribute("categoriaEdicao");
+    
     String idVal = (catEdicao != null) ? String.valueOf(catEdicao.getIdCategoria()) : "";
     String nomeVal = (catEdicao != null) ? catEdicao.getNome() : "";
     String tamVal = (catEdicao != null) ? catEdicao.getTamanho() : "";
@@ -18,15 +20,18 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         h1, h2 { color: #333; }
-        form { background: #f4f4f4; padding: 15px; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        form { background: #f4f4f4; padding: 20px; border-radius: 8px; width: 50%; min-width: 300px; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input, select { padding: 8px; width: 100%; margin-top: 5px; box-sizing: border-box; }
+        button { margin-top: 20px; padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; font-size: 16px; border-radius: 4px; }
+        button:hover { background-color: #0056b3; }
+        table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
         th { background-color: #f2f2f2; }
-        input[type="text"] { width: 250px; padding: 5px; }
-        select { padding: 5px; }
-        button { padding: 8px 12px; background-color: #007bff; color: white; border: none; cursor: pointer; }
-        a { margin-right: 10px; text-decoration: none; color: #007bff; }
+        a { text-decoration: none; color: #007bff; margin-right: 10px; }
         a:hover { text-decoration: underline; }
+        .btn-cancelar { background-color: #6c757d; margin-left: 10px; text-decoration: none; color: white; padding: 10px 20px; border-radius: 4px; font-size: 13px; }
+        .btn-cancelar:hover { background-color: #5a6268; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -38,33 +43,30 @@
     <form action="CategoriaServlet" method="POST">
         <input type="hidden" name="id" value="<%= idVal %>">
         
-        <div>
-            <label for="nome">Nome:</label>
-            <input type="text" id="nome" name="nome" value="<%= nomeVal %>" required>
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" value="<%= nomeVal %>" required>
+        
+        <label for="tamanho">Tamanho:</label>
+        <select id="tamanho" name="tamanho">
+            <option value="Pequeno" <%= "Pequeno".equals(tamVal) ? "selected" : "" %>>Pequeno</option>
+            <option value="Médio" <%= "Médio".equals(tamVal) ? "selected" : "" %>>Médio</option>
+            <option value="Grande" <%= "Grande".equals(tamVal) ? "selected" : "" %>>Grande</option>
+        </select>
+        
+        <label for="embalagem">Embalagem:</label>
+        <select id="embalagem" name="embalagem">
+            <option value="Lata" <%= "Lata".equals(embVal) ? "selected" : "" %>>Lata</option>
+            <option value="Vidro" <%= "Vidro".equals(embVal) ? "selected" : "" %>>Vidro</option>
+            <option value="Plástico" <%= "Plástico".equals(embVal) ? "selected" : "" %>>Plástico</option>
+        </select>
+        
+        <div style="margin-top: 20px;">
+            <button type="submit"><%= (catEdicao != null) ? "Atualizar" : "Salvar" %></button>
+            
+            <% if(catEdicao != null) { %>
+                <a href="CategoriaServlet" class="btn-cancelar">Cancelar</a>
+            <% } %>
         </div>
-        <br>
-        <div>
-            <label for="tamanho">Tamanho:</label>
-            <select id="tamanho" name="tamanho">
-                <option value="Pequeno" <%= "Pequeno".equals(tamVal) ? "selected" : "" %>>Pequeno</option>
-                <option value="Médio" <%= "Médio".equals(tamVal) ? "selected" : "" %>>Médio</option>
-                <option value="Grande" <%= "Grande".equals(tamVal) ? "selected" : "" %>>Grande</option>
-            </select>
-        </div>
-        <br>
-        <div>
-            <label for="embalagem">Embalagem:</label>
-            <select id="embalagem" name="embalagem">
-                <option value="Lata" <%= "Lata".equals(embVal) ? "selected" : "" %>>Lata</option>
-                <option value="Vidro" <%= "Vidro".equals(embVal) ? "selected" : "" %>>Vidro</option>
-                <option value="Plástico" <%= "Plástico".equals(embVal) ? "selected" : "" %>>Plástico</option>
-            </select>
-        </div>
-        <br>
-        <button type="submit"><%= (catEdicao != null) ? "Atualizar" : "Salvar" %></button>
-        <% if(catEdicao != null) { %>
-            <a href="CategoriaServlet" style="margin-left: 10px;">Cancelar</a>
-        <% } %>
     </form>
 
     <hr>
@@ -107,9 +109,9 @@
             <% } %>
         </tbody>
     </table>
-
-	<br><br>
-    <a href="../A3-Controle-Estoque-WEB">Voltar ao Menu Principal</a>
+    
+    <br>
+    <a href="../A3-Controle-Estoque-WEB" style="font-size: 1.2em;">Voltar ao Menu Principal</a>
 
 </body>
 </html>

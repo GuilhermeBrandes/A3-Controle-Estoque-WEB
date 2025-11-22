@@ -1,5 +1,8 @@
 package br.unisul.controleestoque.controller;
 
+import java.io.IOException;
+import java.util.List;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,9 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import br.unisul.controleestoque.dao.CategoriaDAO;
 import br.unisul.controleestoque.model.Categoria;
-
-import java.io.IOException;
-import java.util.List;
 
 @WebServlet("/CategoriaServlet")
 public class CategoriaServlet extends HttpServlet {
@@ -24,26 +24,33 @@ public class CategoriaServlet extends HttpServlet {
         categoriaDAO = new CategoriaDAO();
     }
 
+    // --- RECEBE DADOS DO FORMULÁRIO (SALVAR/ATUALIZAR) ---
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
         request.setCharacterEncoding("UTF-8");
-        
-        System.out.println("Servlet: POST recebido.");
 
+        String idStr = request.getParameter("id");
         String nome = request.getParameter("nome");
         String tamanho = request.getParameter("tamanho");
         String embalagem = request.getParameter("embalagem");
         
-        Categoria novaCategoria = new Categoria();
-        novaCategoria.setNome(nome);
-        novaCategoria.setTamanho(tamanho);
-        novaCategoria.setEmbalagem(embalagem);
+        Categoria categoria = new Categoria();
+        categoria.setNome(nome);
+        categoria.setTamanho(tamanho);
+        categoria.setEmbalagem(embalagem);
         
         try {
-            categoriaDAO.salvar(novaCategoria);
-            System.out.println("Servlet: Categoria salva via DAO.");
+            // Se tem ID, é EDIÇÃO
+            if (idStr != null && !idStr.isEmpty()) {
+                categoria.setIdCategoria(Integer.parseInt(idStr));
+                categoriaDAO.atualizar(categoria);
+            } 
+            // Se não tem ID, é NOVO CADASTRO
+            else {
+                categoriaDAO.salvar(categoria);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -51,36 +58,32 @@ public class CategoriaServlet extends HttpServlet {
         response.sendRedirect("CategoriaServlet");
     }
 
+    // --- CONTROLA A TELA (LISTAR, EXCLUIR, PREPARAR EDIÇÃO) ---
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
         String acao = request.getParameter("acao");
+        String idStr = request.getParameter("id");
         
-        if ("delete".equals(acao)) {
-            String idStr = request.getParameter("id");
-            if (idStr != null) {
-                try {
-                    int id = Integer.parseInt(idStr);
-                    categoriaDAO.excluir(id);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+        // Lógica de Exclusão
+        if ("delete".equals(acao) && idStr != null) {
+            categoriaDAO.excluir(Integer.parseInt(idStr));
             response.sendRedirect("CategoriaServlet");
             return;
         }
-
-        System.out.println("Servlet: GET recebido. Buscando lista...");
-
-        List<Categoria> listaCategorias = categoriaDAO.listar();
         
+        // Lógica de Edição (Carrega os dados para o formulário)
+        if ("editar".equals(acao) && idStr != null) {
+            Categoria catEdicao = categoriaDAO.buscarPorId(Integer.parseInt(idStr));
+            request.setAttribute("categoriaEdicao", catEdicao);
+        }
+
+        // Sempre lista as categorias no final
+        List<Categoria> listaCategorias = categoriaDAO.listar();
         request.setAttribute("listaCategorias", listaCategorias);
         
-        String jsp = "/pages/categoria.jsp"; 
-        RequestDispatcher dispatcher = request.getRequestDispatcher(jsp);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/categoria.jsp");
         dispatcher.forward(request, response);
-        
-        System.out.println("Servlet: Lista enviada para " + jsp);
     }
 }
