@@ -138,5 +138,8 @@
         </tbody>
     </table>
 
+	<br><br>
+    <a href="../A3-Controle-Estoque-WEB">Voltar ao Menu Principal</a>
+
 </body>
 </html>

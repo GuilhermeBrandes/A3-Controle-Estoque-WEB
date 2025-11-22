@@ -184,4 +184,37 @@ public class ProdutoDAO {
         }
         return relatorio;
     }
+    
+    public List<Produto> listarAbaixoDoMinimo() {
+        String sql = "SELECT p.*, c.nome as cat_nome, c.tamanho, c.embalagem " +
+                     "FROM Produto p " +
+                     "INNER JOIN Categoria c ON p.id_categoria = c.id_categoria " +
+                     "WHERE p.qtd_estoque < p.qtd_minima_estoque";
+        
+        List<Produto> lista = new ArrayList<>();
+        
+        try (Connection conexao = ConexaoBD.getConexao();
+             Statement st = conexao.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                Categoria cat = new Categoria();
+                cat.setNome(rs.getString("cat_nome"));
+                
+                Produto p = new Produto();
+                p.setIdProduto(rs.getInt("id_produto"));
+                p.setNome(rs.getString("nome"));
+                p.setPrecoUnitario(rs.getDouble("preco_unitario"));
+                p.setUnidade(rs.getString("unidade"));
+                p.setQtdEstoque(rs.getInt("qtd_estoque"));
+                p.setQtdMinimaEstoque(rs.getInt("qtd_minima_estoque"));
+                p.setCategoria(cat);
+                
+                lista.add(p);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
 }
