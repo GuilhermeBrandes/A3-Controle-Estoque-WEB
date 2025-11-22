@@ -2,7 +2,7 @@ package br.unisul.controleestoque.controller;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet; // Vamos usar este!
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,7 +13,7 @@ import br.unisul.controleestoque.model.Categoria;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/CategoriaServlet") // A anotação vai funcionar agora
+@WebServlet("/CategoriaServlet")
 public class CategoriaServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
@@ -27,6 +27,8 @@ public class CategoriaServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        request.setCharacterEncoding("UTF-8");
         
         System.out.println("Servlet: POST recebido.");
 
@@ -53,6 +55,22 @@ public class CategoriaServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        String acao = request.getParameter("acao");
+        
+        if ("delete".equals(acao)) {
+            String idStr = request.getParameter("id");
+            if (idStr != null) {
+                try {
+                    int id = Integer.parseInt(idStr);
+                    categoriaDAO.excluir(id);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            response.sendRedirect("CategoriaServlet");
+            return;
+        }
+
         System.out.println("Servlet: GET recebido. Buscando lista...");
 
         List<Categoria> listaCategorias = categoriaDAO.listar();
